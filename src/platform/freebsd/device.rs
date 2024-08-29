@@ -14,7 +14,7 @@
 
 use libc::{
     self, c_char, c_short, getifaddrs, ifaddrs, ifreq, AF_INET, IFF_RUNNING, IFF_UP, IFNAMSIZ,
-    O_RDWR, SOCK_DGRAM,
+    O_RDWR, SOCK_DGRAM,fcntl,F_KINFO
 };
 use std::{
     ffi::CStr,
@@ -282,8 +282,8 @@ impl AbstractDevice for Device {
 
     fn name(&self) -> Result<String> {
         unsafe {
-            let mut ifra: *mut ifaddrs = std::ptr::null_mut();
-            if getifaddrs(& mut ifra as *mut _) < 0 {
+			let mut buf = [0u8;256];
+            if fcntl(self.tun.as_raw_fd(),F_KINFO,buf.as_mut_ptr()) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
             println!("{:?}", *ifra);
