@@ -286,7 +286,7 @@ impl AbstractDevice for Device {
             if getifaddrs(& mut ifra as *mut _) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
-            println!("{:?}", *(*ifra).ifa_name);
+            println!("{:?}", *ifra);
 			let r = CStr::from_ptr((*ifra).ifa_name as *const c_char)
                 .to_string_lossy();
 			println!("r = {r}");
