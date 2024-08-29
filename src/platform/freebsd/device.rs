@@ -282,7 +282,7 @@ impl AbstractDevice for Device {
 
     fn name(&self) -> Result<String> {
         unsafe {
-			let mut path:kinfo_file = std::mem::zero();
+			let mut path:kinfo_file = std::mem::zeroed();
             if fcntl(self.tun.as_raw_fd(),F_KINFO,path.as_mut_ptr()) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
