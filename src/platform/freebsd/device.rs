@@ -13,13 +13,12 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use libc::{
-    self, c_char, c_short, getifaddrs, ifaddrs, ifreq, AF_INET, IFF_RUNNING, IFF_UP, IFNAMSIZ,
-    O_RDWR, SOCK_DGRAM,fcntl,F_KINFO,kinfo_file,KINFO_FILE_SIZE
+    self, c_char, c_short, fcntl, getifaddrs, ifaddrs, ifreq, kinfo_file, AF_INET, F_KINFO,
+    IFF_RUNNING, IFF_UP, IFNAMSIZ, KINFO_FILE_SIZE, O_RDWR, SOCK_DGRAM,
 };
 use std::{
     ffi::CStr,
-    io,
-    mem,
+    io, mem,
     net::IpAddr,
     os::unix::io::{AsRawFd, IntoRawFd, RawFd},
     ptr,
@@ -281,17 +280,18 @@ impl AbstractDevice for Device {
     // }
 
     fn name(&self) -> Result<String> {
+        use std::path::PathBuf;
         unsafe {
-			let mut path:kinfo_file = std::mem::zeroed();
-			path.kf_structsize = KINFO_FILE_SIZE;
-            if fcntl(self.tun.as_raw_fd(),F_KINFO,& mut path as * mut _) < 0 {
+            let mut path_info: kinfo_file = std::mem::zeroed();
+            path_info.kf_structsize = KINFO_FILE_SIZE;
+            if fcntl(self.tun.as_raw_fd(), F_KINFO, &mut path_info as *mut _) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
-            //println!("{:?}", path);
-			let r = CStr::from_ptr(path.kf_path.as_ptr() as *const c_char)
-                .to_string_lossy();
-			println!("r = {r}");
-            Ok(String::from("abc"))
+            let dev_path =
+                CStr::from_ptr(path_info.kf_path.as_ptr() as *const c_char).to_string_lossy();
+            let path = PathBuf::from(dev_path);
+            let device_name = path.file_name().ok_or(Error::InvalidConfig)?;
+            Ok(device_name)
         }
     }
     fn set_name(&self, value: &str) -> Result<()> {
