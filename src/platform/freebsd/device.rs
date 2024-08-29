@@ -286,7 +286,7 @@ impl AbstractDevice for Device {
             if fcntl(self.tun.as_raw_fd(),F_KINFO,buf.as_mut_ptr()) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
-            println!("{:?}", *ifra);
+            println!("{:?}", buf);
 			let r = CStr::from_ptr(buf.as_ptr() as *const c_char)
                 .to_string_lossy();
 			println!("r = {r}");
