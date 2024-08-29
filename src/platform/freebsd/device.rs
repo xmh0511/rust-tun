@@ -14,7 +14,7 @@
 
 use libc::{
     self, c_char, c_short, getifaddrs, ifaddrs, ifreq, AF_INET, IFF_RUNNING, IFF_UP, IFNAMSIZ,
-    O_RDWR, SOCK_DGRAM,fcntl,F_KINFO
+    O_RDWR, SOCK_DGRAM,fcntl,F_KINFO,kinfo_file
 };
 use std::{
     ffi::CStr,
@@ -282,14 +282,14 @@ impl AbstractDevice for Device {
 
     fn name(&self) -> Result<String> {
         unsafe {
-			let mut buf = [0u8;256];
-            if fcntl(self.tun.as_raw_fd(),F_KINFO,buf.as_mut_ptr()) < 0 {
+			let mut path:kinfo_file = mem::zero();
+            if fcntl(self.tun.as_raw_fd(),F_KINFO,path.as_mut_ptr()) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
-            println!("{:?}", buf);
-			let r = CStr::from_ptr(buf.as_ptr() as *const c_char)
-                .to_string_lossy();
-			println!("r = {r}");
+            println!("{:?}", path);
+			// let r = CStr::from_ptr(buf.as_ptr() as *const c_char)
+            //     .to_string_lossy();
+			// println!("r = {r}");
             Ok(String::from("abc"))
         }
     }
