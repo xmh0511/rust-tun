@@ -70,7 +70,8 @@ fn main_entry(quit: Receiver<()>) -> Result<(), BoxError> {
         dev2.shutdown().unwrap();
     });
     use tun2::AbstractDevice;
-    dev.name().unwrap();
+    let r = dev.name().unwrap();
+	println!("r = {r}");
     std::thread::spawn(move || {
         loop {
             let amount = dev.recv(&mut buf);
