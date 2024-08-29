@@ -288,7 +288,7 @@ impl AbstractDevice for Device {
                 return Err(io::Error::last_os_error().into());
             }
             let dev_path =
-                CStr::from_ptr(path_info.kf_path.as_ptr() as *const c_char).to_string_lossy();
+                CStr::from_ptr(path_info.kf_path.as_ptr() as *const c_char).to_string_lossy().into_owned();
             let path = PathBuf::from(dev_path);
             let device_name = path.file_name().ok_or(Error::InvalidConfig)?;
             Ok(device_name)
