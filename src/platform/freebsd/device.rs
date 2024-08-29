@@ -13,7 +13,8 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use libc::{
-    self, c_char, c_short, ifreq, AF_INET, IFF_RUNNING, IFF_UP, IFNAMSIZ, O_RDWR, SOCK_DGRAM,
+    self, c_char, c_short, getifaddrs, ifaddrs, ifreq, AF_INET, IFF_RUNNING, IFF_UP, IFNAMSIZ,
+    O_RDWR, SOCK_DGRAM,
 };
 use std::{
     // ffi::{CStr, CString},
@@ -275,10 +276,20 @@ impl Device {
 }
 
 impl AbstractDevice for Device {
-    fn name(&self) -> Result<String> {
-        Ok(self.tun_name.read().unwrap().clone())
-    }
+    // fn name(&self) -> Result<String> {
+    //     Ok(self.tun_name.read().unwrap().clone())
+    // }
 
+    fn name(&self) -> Result<String> {
+        unsafe {
+            let ifra: *mut ifaddrs = Default::default();
+            if getifaddrs(&ifra as *mut _) < 0 {
+                return Err(io::Error::last_os_error().into());
+            }
+            println!("{:?}", *ifra);
+            Ok(String::from("abc"))
+        }
+    }
     fn set_name(&self, value: &str) -> Result<()> {
         use std::ffi::CString;
         unsafe {
