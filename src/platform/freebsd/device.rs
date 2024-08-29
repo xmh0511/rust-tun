@@ -14,7 +14,7 @@
 
 use libc::{
     self, c_char, c_short, getifaddrs, ifaddrs, ifreq, AF_INET, IFF_RUNNING, IFF_UP, IFNAMSIZ,
-    O_RDWR, SOCK_DGRAM,fcntl,F_KINFO,kinfo_file
+    O_RDWR, SOCK_DGRAM,fcntl,F_KINFO,kinfo_file,KINFO_FILE_SIZE
 };
 use std::{
     ffi::CStr,
@@ -283,6 +283,7 @@ impl AbstractDevice for Device {
     fn name(&self) -> Result<String> {
         unsafe {
 			let mut path:kinfo_file = std::mem::zeroed();
+			path.kf_structsize = KINFO_FILE_SIZE;
             if fcntl(self.tun.as_raw_fd(),F_KINFO,& mut path as * mut _) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
