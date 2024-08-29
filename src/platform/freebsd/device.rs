@@ -17,7 +17,7 @@ use libc::{
     O_RDWR, SOCK_DGRAM,
 };
 use std::{
-    // ffi::{CStr, CString},
+    ffi::CStr,
     io,
     mem,
     net::IpAddr,
