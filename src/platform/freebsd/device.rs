@@ -13,7 +13,7 @@
 //  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use libc::{
-    self, c_char, c_short, fcntl, getifaddrs, ifaddrs, ifreq, kinfo_file, AF_INET, F_KINFO,
+    self, c_char, c_short, fcntl, ifreq, kinfo_file, AF_INET, F_KINFO,
     IFF_RUNNING, IFF_UP, IFNAMSIZ, KINFO_FILE_SIZE, O_RDWR, SOCK_DGRAM,
 };
 use std::{
@@ -54,9 +54,9 @@ impl Device {
     pub fn new(config: &Configuration) -> Result<Self> {
         let layer = config.layer.unwrap_or(Layer::L3);
         let device_prefix = if layer == Layer::L3 {
-            format!("tun")
+            "tun".to_string()
         } else {
-            format!("tap")
+            "tap".to_string()
         };
         let device = unsafe {
             let dev_index = match config.name.as_ref() {
