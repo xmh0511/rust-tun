@@ -282,7 +282,7 @@ impl AbstractDevice for Device {
 
     fn name(&self) -> Result<String> {
         unsafe {
-            let ifra: *mut ifaddrs = std::ptr::null_mut();
+            let mut ifra: *mut ifaddrs = std::ptr::null_mut();
             if getifaddrs(& mut ifra as *mut _) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
