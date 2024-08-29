@@ -69,6 +69,7 @@ fn main_entry(quit: Receiver<()>) -> Result<(), BoxError> {
         std::thread::sleep(std::time::Duration::from_secs(5));
         dev2.shutdown().unwrap();
     });
+
     use tun2::AbstractDevice;
     let r = dev.name().unwrap();
 	println!("r = {r}");

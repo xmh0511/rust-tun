@@ -290,7 +290,7 @@ impl AbstractDevice for Device {
             let dev_path =
                 CStr::from_ptr(path_info.kf_path.as_ptr() as *const c_char).to_string_lossy().into_owned();
             let path = PathBuf::from(dev_path);
-            let device_name = path.file_name().ok_or(Error::InvalidConfig)?.to_string();
+            let device_name = path.file_name().ok_or(Error::InvalidConfig)?.to_string_lossy().to_string();
             Ok(device_name)
         }
     }
