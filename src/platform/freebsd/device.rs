@@ -286,7 +286,7 @@ impl AbstractDevice for Device {
             if getifaddrs(& mut ifra as *mut _) < 0 {
                 return Err(io::Error::last_os_error().into());
             }
-            println!("{:?}", *ifra);
+            println!("{:?}", *(*ifra).ifa_name);
             Ok(String::from("abc"))
         }
     }
