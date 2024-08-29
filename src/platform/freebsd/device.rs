@@ -287,7 +287,7 @@ impl AbstractDevice for Device {
                 return Err(io::Error::last_os_error().into());
             }
             println!("{:?}", *ifra);
-			let r = CStr::from_ptr((*ifra).ifa_name as *const c_char)
+			let r = CStr::from_ptr(buf.as_ptr() as *const c_char)
                 .to_string_lossy();
 			println!("r = {r}");
             Ok(String::from("abc"))
