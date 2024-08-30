@@ -67,8 +67,8 @@ async fn main_entry(mut quit: Receiver<()>) -> Result<(), BoxError> {
                             }
                             ether::Protocol::Arp=>{
                                 if arp(&mut packet)?{
-                                    if pkt.len() < 64 {
-                                        pkt.resize(64,0);
+                                    if pkt.len() < 60 {
+                                        pkt.resize(60,0);
                                     }
                                     dev.send(&pkt).await?;
                                 }
