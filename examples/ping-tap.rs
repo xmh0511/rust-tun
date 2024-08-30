@@ -120,7 +120,6 @@ pub fn ping(packet: &mut ether::Packet<Vec<u8>>) -> Result<bool, BoxError> {
 pub fn arp(packet: &mut ether::Packet<Vec<u8>>) -> Result<bool, BoxError> {
     const MAC: [u8; 6] = [0xf, 0xf, 0xf, 0xf, 0xe, 0x9];
     let sender_h = packet.source();
-    let target_h = packet.source();
     let mut arp_packet = ArpPacket::new(packet.payload_mut())?;
     println!("arp_packet={:?}", arp_packet);
     if arp_packet.op_code() != 1 {
@@ -137,7 +136,7 @@ pub fn arp(packet: &mut ether::Packet<Vec<u8>>) -> Result<bool, BoxError> {
     arp_packet.set_sender_protocol_addr(&target_p);
     arp_packet.set_sender_hardware_addr(&MAC);
     packet.set_destination(sender_h)?;
-    packet.set_source(target_h)?;
+    packet.set_source(MAC.into())?;
     Ok(true)
 }
 
