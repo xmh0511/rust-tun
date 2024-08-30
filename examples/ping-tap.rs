@@ -56,8 +56,8 @@ async fn main_entry(mut quit: Receiver<()>) -> Result<(), BoxError> {
                 break;
             }
             len = dev.recv(&mut buf) => {
-                let pkt: Vec<u8> = buf[..len?].to_vec();
-                match ether::Packet::new(pkt){
+                let mut pkt: Vec<u8> = buf[..len?].to_vec();
+                match ether::Packet::new(&mut pkt){
                     Ok(mut packet) => {
                         match packet.protocol(){
                             ether::Protocol::Ipv4=>{
@@ -67,7 +67,10 @@ async fn main_entry(mut quit: Receiver<()>) -> Result<(), BoxError> {
                             }
                             ether::Protocol::Arp=>{
                                 if arp(&mut packet)?{
-                                    dev.send(packet.as_ref()).await?;
+                                    if pkt.len() < 64 {
+                                        pkt.resize(64,0);
+                                    }
+                                    dev.send(&pkt).await?;
                                 }
                             }
                             protocol=>{
@@ -84,7 +87,7 @@ async fn main_entry(mut quit: Receiver<()>) -> Result<(), BoxError> {
     }
     Ok(())
 }
-pub fn ping(packet: &mut ether::Packet<Vec<u8>>) -> Result<bool, BoxError> {
+pub fn ping(packet: &mut ether::Packet<&mut Vec<u8>>) -> Result<bool, BoxError> {
     let source = packet.source();
     let destination = packet.destination();
 
@@ -117,7 +120,7 @@ pub fn ping(packet: &mut ether::Packet<Vec<u8>>) -> Result<bool, BoxError> {
     }
     Ok(false)
 }
-pub fn arp(packet: &mut ether::Packet<Vec<u8>>) -> Result<bool, BoxError> {
+pub fn arp(packet: &mut ether::Packet<&mut Vec<u8>>) -> Result<bool, BoxError> {
     const MAC: [u8; 6] = [0xf, 0xf, 0xf, 0xf, 0xe, 0x9];
     let sender_h = packet.source();
     let mut arp_packet = ArpPacket::new(packet.payload_mut())?;
